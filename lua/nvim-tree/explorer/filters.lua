@@ -90,6 +90,20 @@ local function custom(path)
   return false
 end
 
+local function is_executable(path, executables_list)
+  if not M.config.filter_is_executable or path == nil then
+    return false
+  end
+  if type(executables_list) == "table" then
+    for _, b in ipairs(executables_list) do
+      if b== path or b:find(path .. "/", 1, true) then
+        return false
+      end
+    end
+  end
+  return not require("nvim-tree.utils").is_executable_file(path)
+end
+
 ---Prepare arguments for should_filter. This is done prior to should_filter for efficiency reasons.
 ---@param git_status table|nil optional results of git.load_project_status(...)
 ---@param unloaded_bufnr number|nil optional bufnr recently unloaded via BufUnload event
@@ -97,15 +111,20 @@ end
 --- git_status: reference
 --- unloaded_bufnr: copy
 --- bufinfo: empty unless no_buffer set: vim.fn.getbufinfo { buflisted = 1 }
-function M.prepare(git_status, unloaded_bufnr)
+function M.prepare(git_status, unloaded_bufnr, dir)
   local status = {
     git_status = git_status or {},
     unloaded_bufnr = unloaded_bufnr,
     bufinfo = {},
+    executables_list = {},
   }
 
   if M.config.filter_no_buffer then
     status.bufinfo = vim.fn.getbufinfo { buflisted = 1 }
+  end
+
+  if M.config.filter_is_executable and dir then
+    status.executables_list = require("nvim-tree.utils").list_executable_files(dir)
   end
 
   return status
@@ -121,7 +140,11 @@ function M.should_filter(path, status)
     return false
   end
 
-  return git(path, status.git_status) or buf(path, status.bufinfo, status.unloaded_bufnr) or dotfile(path) or custom(path)
+  return git(path, status.git_status)
+      or buf(path, status.bufinfo, status.unloaded_bufnr)
+      or dotfile(path)
+      or custom(path)
+      or is_executable(path, status.executables_list)
 end
 
 function M.setup(opts)
@@ -131,6 +154,7 @@ function M.setup(opts)
     filter_git_ignored = opts.filters.git_ignored,
     filter_git_clean = opts.filters.git_clean,
     filter_no_buffer = opts.filters.no_buffer,
+    filter_is_executable = opts.filters.is_executable,
   }
 
   M.ignore_list = {}

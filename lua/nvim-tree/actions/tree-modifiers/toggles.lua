@@ -36,4 +36,9 @@ function M.dotfiles()
   reload()
 end
 
+function M.is_executable()
+  filters.config.filter_is_executable = not filters.config.filter_is_executable
+  reload()
+end
+
 return M

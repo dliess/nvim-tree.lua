@@ -524,6 +524,7 @@ local DEFAULT_OPTS = { -- BEGIN_DEFAULT_OPTS
     dotfiles = false,
     git_clean = false,
     no_buffer = false,
+    is_executable = false,
     custom = {},
     exclude = {},
   },

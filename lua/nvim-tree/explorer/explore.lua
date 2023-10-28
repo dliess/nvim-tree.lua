@@ -18,7 +18,7 @@ end
 local function populate_children(handle, cwd, node, git_status)
   local node_ignored = explorer_node.is_git_ignored(node)
   local nodes_by_path = utils.bool_record(node.nodes, "absolute_path")
-  local filter_status = filters.prepare(git_status)
+  local filter_status = filters.prepare(git_status, nil, cwd)
   while true do
     local name, t = vim.loop.fs_scandir_next(handle)
     if not name then

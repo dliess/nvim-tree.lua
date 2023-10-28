@@ -67,7 +67,7 @@ function M.reload(node, git_status, unloaded_bufnr)
 
   local profile = log.profile_start("reload %s", node.absolute_path)
 
-  local filter_status = filters.prepare(git_status, unloaded_bufnr)
+  local filter_status = filters.prepare(git_status, unloaded_bufnr, cwd)
 
   if node.group_next then
     node.nodes = { node.group_next }

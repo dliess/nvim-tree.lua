@@ -491,4 +491,51 @@ function M.is_nvim_tree_buf(bufnr)
   return false
 end
 
+function M.is_executable_file(absolute_path)
+  if absolute_path == nil then
+    return false
+  end
+  local stat = vim.loop.fs_stat(absolute_path)
+  if stat and stat.type == "file" then
+    return M.is_executable(absolute_path)
+  end
+  return false
+end
+
+--- path is an executable file or directory
+--- @param absolute_path string
+--- @return boolean
+function M.is_executable(absolute_path)
+  if M.is_windows or M.is_wsl then
+    --- executable detection on windows is buggy and not performant hence it is disabled
+    return false
+  else
+    return vim.loop.fs_access(absolute_path, "X")
+  end
+end
+
+function M.list_executable_files(dir)
+  local handle, _ = vim.loop.fs_scandir(dir)
+  if not handle then
+    return nil
+  end
+  local executables = {}
+  while true do
+    local name, type = vim.loop.fs_scandir_next(handle)
+    if not name then break end
+    local path = dir .. '/' .. name
+    if type == "file" and M.is_executable(path) then
+      table.insert(executables, path)
+    elseif type == "directory" then
+      local sub_executables = M.list_executable_files(path)
+      if sub_executables then
+        for _, sub_exec in ipairs(sub_executables) do
+          table.insert(executables, sub_exec)
+        end
+      end
+    end
+  end
+  return executables
+end
+
 return M

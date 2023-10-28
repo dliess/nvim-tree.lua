@@ -167,6 +167,7 @@ Show the mappings:  `g?`
 `d`               Delete                     |nvim-tree-api.fs.remove()|
 `D`               Trash                      |nvim-tree-api.fs.trash()|
 `E`               Expand All                 |nvim-tree-api.tree.expand_all()|
+`Ex`              Toggle Filter: Is Executbale   |nvim-tree-api.tree.toggle_is_executable_filter()|
 `e`               Rename: Basename           |nvim-tree-api.fs.rename_basename()|
 `]e`              Next Diagnostic            |nvim-tree-api.node.navigate.diagnostics.next()|
 `[e`              Prev Diagnostic            |nvim-tree-api.node.navigate.diagnostics.prev()|
@@ -502,6 +503,7 @@ Following is the default configuration. See |nvim-tree-opts| for details.
         dotfiles = false,
         git_clean = false,
         no_buffer = false,
+        is_executable = false,
         custom = {},
         exclude = {},
       },
@@ -1220,6 +1222,11 @@ For performance reasons this may not immediately update on buffer
 delete/wipe. A reload or filesystem event will result in an update.
   Type: `boolean`, Default: `false`
 
+*nvim-tree.filters.is_executable*
+Only show executable files.
+Toggle via |nvim-tree-api.tree.toggle_is_executable_filter()|, default `Ex`
+  Type: `boolean`, Default: `false`
+
 *nvim-tree.filters.custom*
 Custom list of vim regex for file/directory names that will not be shown.
 Backslashes must be escaped e.g. "^\\.git". See |string-match|.
@@ -1657,6 +1664,10 @@ tree.toggle_git_clean_filter()
                                 *nvim-tree-api.tree.toggle_no_buffer_filter()*
 tree.toggle_no_buffer_filter()
     Toggle |nvim-tree.filters.no_buffer| filter.
+
+                                *nvim-tree-api.tree.toggle_is_executable_filter()*
+tree.toggle_is_executable_filter()
+    Toggle |nvim-tree.filters.is_executable| filter.
 
                                    *nvim-tree-api.tree.toggle_custom_filter()*
 tree.toggle_custom_filter()
@@ -2114,6 +2125,7 @@ You are encouraged to copy these to your own |nvim-tree.on_attach| function.
   vim.keymap.set('n', 'd',       api.fs.remove,                       opts('Delete'))
   vim.keymap.set('n', 'D',       api.fs.trash,                        opts('Trash'))
   vim.keymap.set('n', 'E',       api.tree.expand_all,                 opts('Expand All'))
+  vim.keymap.set('n', 'Ex',      api.tree.toggle_is_executable_filter,opts('Toggle Filter: Is Executable'))
   vim.keymap.set('n', 'e',       api.fs.rename_basename,              opts('Rename: Basename'))
   vim.keymap.set('n', ']e',      api.node.navigate.diagnostics.next,  opts('Next Diagnostic'))
   vim.keymap.set('n', '[e',      api.node.navigate.diagnostics.prev,  opts('Prev Diagnostic'))
